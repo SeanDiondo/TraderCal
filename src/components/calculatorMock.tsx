@@ -1,0 +1,226 @@
+import React, { useState, useEffect } from "react";
+import styles from "./styles/CalculatorMock.module.css";
+
+interface CalculatorState {
+  stoplossLimit: number;
+  capital: number;
+  riskPercent: number;
+  position: 'long' | 'short';
+  entryPrice: number;
+  targetPrice: number;
+  cutlossPrice: number;
+}
+
+const CalculatorMock: React.FC = () => {
+  const [values, setValues] = useState<CalculatorState>({
+    stoplossLimit: 0,
+    capital: 0,
+    riskPercent: 0,
+    position: 'short',
+    entryPrice: 0,
+    targetPrice: 0,
+    cutlossPrice: 0,
+  });
+
+  const [results, setResults] = useState({
+    leverage: 0,
+    riskPercentage: 0,
+    rewardPercentage: 0,
+    positionSize: 0,
+    contractSize: 0,
+  });
+
+  useEffect(() => {
+    calculateResults();
+  }, [values]);
+
+  const calculateResults = () => {
+    const { capital, stoplossLimit, entryPrice, targetPrice, cutlossPrice, position } = values;
+
+    // Calculate price difference between entry and cutloss
+    const priceDiff = Math.abs(entryPrice - cutlossPrice);
+
+    // Calculate leverage based on stoploss limit percentage
+    // Leverage = (Stoploss Limit % / 100) * (Entry Price / Price Difference)
+    let leverage = 0;
+    if (priceDiff > 0 && stoplossLimit > 0 && entryPrice > 0) {
+      leverage = (stoplossLimit / 100) * (entryPrice / priceDiff);
+    }
+
+    // Calculate position size based on calculated leverage
+    const positionSize = capital * leverage;
+
+    // Calculate contract size (position size / entry price)
+    const contractSize = entryPrice > 0 ? positionSize / entryPrice : 0;
+
+    // Calculate risk percentage based on position
+    let riskPercentage = 0;
+    let rewardPercentage = 0;
+
+    if (position === 'long') {
+      // For long: risk if price goes down to cutloss
+      const priceDiffRisk = cutlossPrice - entryPrice;
+      riskPercentage = entryPrice > 0 ? (priceDiffRisk / entryPrice) * 100 * leverage : 0;
+
+      // Reward if price goes up to target
+      const priceDiffReward = targetPrice - entryPrice;
+      rewardPercentage = entryPrice > 0 ? (priceDiffReward / entryPrice) * 100 * leverage : 0;
+    } else {
+      // For short: risk if price goes up to cutloss
+      const priceDiffRisk = cutlossPrice - entryPrice;
+      riskPercentage = entryPrice > 0 ? (priceDiffRisk / entryPrice) * 100 * leverage : 0;
+
+      // Reward if price goes down to target
+      const priceDiffReward = entryPrice - targetPrice;
+      rewardPercentage = entryPrice > 0 ? (priceDiffReward / entryPrice) * 100 * leverage : 0;
+    }
+
+    setResults({
+      leverage: leverage,
+      riskPercentage: riskPercentage,
+      rewardPercentage: rewardPercentage,
+      positionSize: positionSize,
+      contractSize: contractSize,
+    });
+  };
+
+  const handleChange = (field: keyof CalculatorState, value: string | number | 'long' | 'short') => {
+    setValues(prev => ({
+      ...prev,
+      [field]: typeof value === 'number' ? value : (value === '' ? 0 : parseFloat(value as string) || 0)
+    }));
+  };
+
+  const formatNumber = (num: number, decimals: number = 2): string => {
+    return num.toFixed(decimals);
+  };
+
+  const formatCurrency = (num: number): string => {
+    return `$${num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  };
+
+  return (
+    <div className={styles.frame} role="region" aria-label="Leverage calculator">
+      <div className={styles.colLeft}>
+        <label className={styles.label}>Stoploss limit %</label>
+        <input
+          type="number"
+          step="0.1"
+          min="0"
+          max="100"
+          className={styles.valueGreen}
+          value={values.stoplossLimit || ''}
+          onChange={(e) => handleChange('stoplossLimit', e.target.value)}
+        />
+
+        <label className={styles.label}>Capital/Funds</label>
+        <input
+          type="number"
+          className={styles.valueGreen}
+          value={values.capital || ''}
+          onChange={(e) => handleChange('capital', e.target.value)}
+        />
+
+        <label className={styles.label}>Risk %</label>
+        <input
+          type="number"
+          step="0.1"
+          min="0"
+          max="100"
+          className={styles.valueGreen}
+          value={values.riskPercent || ''}
+          onChange={(e) => handleChange('riskPercent', e.target.value)}
+        />
+
+        <div className={styles.sliderRow}>
+          <span className={styles.usd}>$1</span>
+          <div className={styles.sliderTrack}>
+            <div className={styles.sliderThumb} />
+            <span className={styles.sliderMarker}>₱60.27</span>
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.divider} />
+
+      <div className={styles.colRight}>
+        <div className={styles.toggleRow}>
+          <span>Long</span>
+          <input
+            type="radio"
+            name="position"
+            checked={values.position === 'long'}
+            onChange={() => handleChange('position', 'long')}
+            className={styles.checkbox}
+          />
+        </div>
+        <div className={styles.toggleRow}>
+          <span>Short</span>
+          <input
+            type="radio"
+            name="position"
+            checked={values.position === 'short'}
+            onChange={() => handleChange('position', 'short')}
+            className={`${styles.checkbox} ${styles.checked}`}
+          />
+        </div>
+
+        <div className={styles.inputRow}>
+          <span>Leverage</span>
+          <div className={styles.inputBox}>{formatNumber(results.leverage, 2)}x</div>
+        </div>
+
+        <div className={styles.inputRow}>
+          <span>Planned ENTRY price</span>
+          <input
+            type="number"
+            step="0.01"
+            className={styles.inputBox}
+            value={values.entryPrice || ''}
+            onChange={(e) => handleChange('entryPrice', e.target.value)}
+          />
+        </div>
+        <div className={styles.inputRow}>
+          <span>Planned TARGET price</span>
+          <input
+            type="number"
+            step="0.01"
+            className={styles.inputBox}
+            value={values.targetPrice || ''}
+            onChange={(e) => handleChange('targetPrice', e.target.value)}
+          />
+        </div>
+        <div className={styles.inputRow}>
+          <span>Planned CUTLOSS price</span>
+          <input
+            type="number"
+            step="0.01"
+            className={styles.inputBox}
+            value={values.cutlossPrice || ''}
+            onChange={(e) => handleChange('cutlossPrice', e.target.value)}
+          />
+        </div>
+
+        <div className={styles.inputRow}>
+          <span>Risk Percentage</span>
+          <div className={styles.inputBox}>{formatNumber(results.riskPercentage, 2)}%</div>
+        </div>
+        <div className={styles.inputRow}>
+          <span>Reward Percentage</span>
+          <div className={styles.inputBox}>{formatNumber(results.rewardPercentage, 2)}%</div>
+        </div>
+
+        <div className={styles.inputRow}>
+          <span>Position Size</span>
+          <div className={styles.inputBox}>{formatCurrency(results.positionSize)}</div>
+        </div>
+        <div className={styles.inputRow}>
+          <span>Contract Size</span>
+          <div className={styles.inputBox}>{formatNumber(results.contractSize, 2)}</div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CalculatorMock;

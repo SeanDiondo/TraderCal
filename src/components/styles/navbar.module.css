@@ -1,0 +1,27 @@
+.header{
+  position:sticky; top:0; z-index:20;
+  background:#fff; border-bottom:1px solid var(--border);
+}
+.row{
+  display:flex; align-items:center; justify-content:space-between;
+  height:64px;
+}
+.logo{
+  font-weight:800; font-size:32px; letter-spacing:-0.02em;
+  text-decoration:none;
+  display:flex;
+  align-items:center;
+}
+.logo img{
+  height:40px;
+  width:auto;
+  display:block;
+  max-width:200px;
+  object-fit:contain;
+}
+.nav{
+  display:flex; gap:28px;
+}
+.nav a{
+  font-weight:500; color:#111827;
+}
