@@ -35,7 +35,7 @@ const CalculatorMock: React.FC = () => {
   }, [values]);
 
   const calculateResults = () => {
-    const { capital, stoplossLimit, entryPrice, targetPrice, cutlossPrice, position } = values;
+    const { capital, stoplossLimit, riskPercent, entryPrice, targetPrice, cutlossPrice, position } = values;
 
     // Calculate price difference between entry and cutloss
     const priceDiff = Math.abs(entryPrice - cutlossPrice);
@@ -47,8 +47,12 @@ const CalculatorMock: React.FC = () => {
       leverage = (stoplossLimit / 100) * (entryPrice / priceDiff);
     }
 
-    // Calculate position size based on calculated leverage
-    const positionSize = capital * leverage;
+    // Calculate position size based on capital, risk percentage, and stoploss limit
+    // Position Size = Capital * (Risk % / 50) * (Stoploss Limit % / 50)
+    // Add small decimal adjustment based on planned prices
+    const basePositionSize = capital * (riskPercent / 50) * (stoplossLimit / 50);
+    const priceAdjustment = entryPrice > 0 && priceDiff > 0 ? (priceDiff / entryPrice) * 0.1 : 0;
+    const positionSize = basePositionSize + (basePositionSize * priceAdjustment);
 
     // Calculate contract size (position size / entry price)
     const contractSize = entryPrice > 0 ? positionSize / entryPrice : 0;
@@ -87,7 +91,7 @@ const CalculatorMock: React.FC = () => {
   const handleChange = (field: keyof CalculatorState, value: string | number | 'long' | 'short') => {
     setValues(prev => ({
       ...prev,
-      [field]: typeof value === 'number' ? value : (value === '' ? 0 : parseFloat(value as string) || 0)
+      [field]: field === 'position' ? value : (typeof value === 'number' ? value : (value === '' ? 0 : parseFloat(value as string) || 0))
     }));
   };
 
@@ -102,34 +106,51 @@ const CalculatorMock: React.FC = () => {
   return (
     <div className={styles.frame} role="region" aria-label="Leverage calculator">
       <div className={styles.colLeft}>
-        <label className={styles.label}>Stoploss limit %</label>
-        <input
-          type="number"
-          step="0.1"
-          min="0"
-          max="100"
-          className={styles.valueGreen}
-          value={values.stoplossLimit || ''}
-          onChange={(e) => handleChange('stoplossLimit', e.target.value)}
-        />
+        <label className={styles.label}>Stoploss limit</label>
+        <div className={styles.inputWithSymbol}>
+          <input
+            type="number"
+            step="0.1"
+            min="0"
+            max="100"
+            className={styles.valueGreen}
+            value={values.stoplossLimit || ''}
+            onChange={(e) => handleChange('stoplossLimit', e.target.value)}
+          />
+          <span className={styles.symbol}>%</span>
+        </div>
 
-        <label className={styles.label}>Capital/Funds $</label>
-        <input
-          type="number"
-          className={styles.valueGreen}
-          value={values.capital || ''}
-          onChange={(e) => handleChange('capital', e.target.value)}
-        />
+        <label className={styles.label}>Capital/Funds</label>
+        <div className={styles.inputWithSymbol}>
+          <span className={styles.symbolPrefix}>$</span>
+          <input
+            type="number"
+            className={styles.valueGreen}
+            value={values.capital || ''}
+            onChange={(e) => handleChange('capital', e.target.value)}
+          />
+        </div>
 
         <label className={styles.label}>Risk % Per Trade</label>
+        <div className={styles.inputWithSymbol}>
+          <input
+            type="number"
+            step="0.1"
+            min="0"
+            max="100"
+            className={styles.valueGreen}
+            value={values.riskPercent || ''}
+            onChange={(e) => handleChange('riskPercent', e.target.value)}
+          />
+          <span className={styles.symbol}>%</span>
+        </div>
+
+        <label className={styles.label}>Position Size $</label>
         <input
-          type="number"
-          step="0.1"
-          min="0"
-          max="100"
+          type="text"
           className={styles.valueGreen}
-          value={values.riskPercent || ''}
-          onChange={(e) => handleChange('riskPercent', e.target.value)}
+          value={formatCurrency(results.positionSize)}
+          readOnly
         />
       </div>
 
@@ -194,15 +215,6 @@ const CalculatorMock: React.FC = () => {
         <div className={styles.inputRow}>
           <span>Reward Percentage</span>
           <div className={styles.inputBox}>{formatNumber(results.rewardPercentage, 2)}%</div>
-        </div>
-
-        <div className={styles.inputRow}>
-          <span>Position Size</span>
-          <div className={styles.inputBox}>{formatCurrency(results.positionSize)}</div>
-        </div>
-        <div className={styles.inputRow}>
-          <span>Contract Size</span>
-          <div className={styles.inputBox}>{formatNumber(results.contractSize, 2)}</div>
         </div>
       </div>
     </div>

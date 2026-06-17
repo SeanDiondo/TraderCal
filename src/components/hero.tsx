@@ -10,8 +10,8 @@ const Hero: React.FC = () => {
           <div className={styles.left}>
             <h1 className={styles.title}>Trading as a Business</h1>
             <p className={styles.subtitle}>
-              Featuring our Leverage Calculator. You should not guess your leverage or trading is just a Gamble,
-              Calculate your Risk and Protect your Capital.
+              Featuring our Leverage Calculator for Futures Trading. Calculate your Risk and Protect your Capital,
+              Every trade should be calculated before execution.
             </p>
             <div className={styles.howToUse}>
               <h2 className={styles.howToUseTitle}>How to Use</h2>

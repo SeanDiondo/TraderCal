@@ -26,5 +26,9 @@
   display:flex; gap:28px;
 }
 .nav a{
-  font-weight:500; color:#111827;
+  font-weight:500; color:var(--text);
+  transition:color 0.2s;
+}
+.nav a:hover{
+  color:var(--primary);
 }

@@ -13,7 +13,8 @@
 .links{
   display:flex; gap:28px; align-items:flex-start; justify-content:flex-end;
 }
-.links a{ color:#374151; font-weight:500; }
+.links a{ color:var(--text); font-weight:500; transition:color 0.2s; }
+.links a:hover{ color:var(--primary); }
 @media (max-width:900px){
   .grid{ grid-template-columns: 1fr; }
   .links{ justify-content:flex-start; }

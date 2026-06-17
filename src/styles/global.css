@@ -1,12 +1,15 @@
 :root{
   --bg:#ffffff;
   --text:#0a0a0a;
-  --muted:#5f6368;
-  --accent:#0b5;
-  --card:#2b2d31;
-  --card-2:#202225;
+  --muted:#6b7280;
+  --primary:#0a0a0a;
+  --foreground:#1f2937;
+  --card:#ffffff;
+  --card-2:#f9fafb;
   --border:#e5e7eb;
-  --link:#111827;
+  --link:#0a0a0a;
+  --success:#22c55e;
+  --danger:#ef4444;
 }
 
 *{ box-sizing:border-box; }
