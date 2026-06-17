@@ -7,7 +7,7 @@ const Navbar: React.FC = () => {
     <header className={styles.header}>
       <div className={`container ${styles.row}`}>
         <Link to="/" className={styles.logo} aria-label="TradeSmart">
-          <img src="/logo.jpg" alt="TradeSmart" style={{ maxWidth: '200px', height: '40px', objectFit: 'contain' }} />TraderCal
+          <img src="/logo.png" alt="TradeSmart" style={{ maxWidth: '200px', height: '40px', objectFit: 'contain' }} />TraderCal
         </Link>
         <nav className={styles.nav} aria-label="Primary">
           <a href="#tools">Tools</a>

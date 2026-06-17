@@ -15,22 +15,22 @@ const Hero: React.FC = () => {
             </p>
             <div className={styles.howToUse}>
               <h2 className={styles.howToUseTitle}>How to Use</h2>
-              <ul className={styles.steps}>
+              <ul className={styles.steps}>           
                 <li className={styles.step}>
                   <span className={styles.stepNumber}>1</span>
-                  <span className={styles.stepText}>Input <strong>Stoploss limit %</strong> - the allowed % of loss of the trader</span>
+                  <span className={styles.stepText}>Input <strong>Stoploss limit %</strong> - The allowed percentage of loss of the trader</span>
                 </li>
                 <li className={styles.step}>
                   <span className={styles.stepNumber}>2</span>
-                  <span className={styles.stepText}>Input <strong>Capital fund</strong></span>
+                  <span className={styles.stepText}>Input <strong>Capital funds</strong></span>
                 </li>
                 <li className={styles.step}>
                   <span className={styles.stepNumber}>3</span>
-                  <span className={styles.stepText}>Input <strong>Risk %</strong> - the % of the capital per trade</span>
+                  <span className={styles.stepText}>Input <strong>Risk %</strong> - The Risk Percentage of your capital per trade</span>
                 </li>
                 <li className={styles.step}>
                   <span className={styles.stepNumber}>4</span>
-                  <span className={styles.stepText}>Input <strong>Planned prices</strong> if you already have charted the stocks, crypto, and other trading assets</span>
+                  <span className={styles.stepText}>Input <strong>Planned prices</strong> - The prices you plan to enter and exit for your Trading Pairs</span>
                 </li>
               </ul>
             </div>
