@@ -17,6 +17,29 @@
 .subtitle{
   font-size:20px; color:var(--muted); margin:0;
 }
+.howToUse{
+  margin-top:32px;
+}
+.howToUseTitle{
+  font-size:24px; font-weight:700; margin:0 0 16px;
+}
+.steps{
+  list-style:none; margin:0; padding:0;
+}
+.step{
+  display:flex; align-items:flex-start; gap:12px; margin-bottom:12px;
+}
+.stepNumber{
+  display:flex; align-items:center; justify-content:center;
+  width:28px; height:28px; background:var(--primary); color:white;
+  border-radius:50%; font-weight:700; font-size:14px; flex-shrink:0;
+}
+.stepText{
+  font-size:16px; line-height:1.5; color:var(--foreground);
+}
+.stepText strong{
+  color:var(--primary);
+}
 .right{
   display:flex; justify-content:center;
 }

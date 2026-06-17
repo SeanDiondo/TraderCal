@@ -5,7 +5,7 @@ interface CalculatorState {
   stoplossLimit: number;
   capital: number;
   riskPercent: number;
-  position: 'long' | 'short';
+  position: 'long' | 'short' | '';
   entryPrice: number;
   targetPrice: number;
   cutlossPrice: number;
@@ -16,7 +16,7 @@ const CalculatorMock: React.FC = () => {
     stoplossLimit: 0,
     capital: 0,
     riskPercent: 0,
-    position: 'short',
+    position: '',
     entryPrice: 0,
     targetPrice: 0,
     cutlossPrice: 0,
@@ -113,7 +113,7 @@ const CalculatorMock: React.FC = () => {
           onChange={(e) => handleChange('stoplossLimit', e.target.value)}
         />
 
-        <label className={styles.label}>Capital/Funds</label>
+        <label className={styles.label}>Capital/Funds $</label>
         <input
           type="number"
           className={styles.valueGreen}
@@ -121,7 +121,7 @@ const CalculatorMock: React.FC = () => {
           onChange={(e) => handleChange('capital', e.target.value)}
         />
 
-        <label className={styles.label}>Risk %</label>
+        <label className={styles.label}>Risk % Per Trade</label>
         <input
           type="number"
           step="0.1"
@@ -131,14 +131,6 @@ const CalculatorMock: React.FC = () => {
           value={values.riskPercent || ''}
           onChange={(e) => handleChange('riskPercent', e.target.value)}
         />
-
-        <div className={styles.sliderRow}>
-          <span className={styles.usd}>$1</span>
-          <div className={styles.sliderTrack}>
-            <div className={styles.sliderThumb} />
-            <span className={styles.sliderMarker}>₱60.27</span>
-          </div>
-        </div>
       </div>
 
       <div className={styles.divider} />
@@ -146,22 +138,16 @@ const CalculatorMock: React.FC = () => {
       <div className={styles.colRight}>
         <div className={styles.toggleRow}>
           <span>Long</span>
-          <input
-            type="radio"
-            name="position"
-            checked={values.position === 'long'}
-            onChange={() => handleChange('position', 'long')}
-            className={styles.checkbox}
+          <div
+            className={`${styles.checkbox} ${values.position === 'long' ? styles.checkedLong : ''}`}
+            onClick={() => handleChange('position', 'long')}
           />
         </div>
         <div className={styles.toggleRow}>
           <span>Short</span>
-          <input
-            type="radio"
-            name="position"
-            checked={values.position === 'short'}
-            onChange={() => handleChange('position', 'short')}
-            className={`${styles.checkbox} ${styles.checked}`}
+          <div
+            className={`${styles.checkbox} ${values.position === 'short' ? styles.checkedShort : ''}`}
+            onClick={() => handleChange('position', 'short')}
           />
         </div>
 

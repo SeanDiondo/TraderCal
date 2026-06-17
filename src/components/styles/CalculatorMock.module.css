@@ -1,6 +1,6 @@
 .frame{
   width:min(560px, 100%);
-  aspect-ratio: 1 / 1.1;
+  aspect-ratio: 1 / 0.85;
   background:linear-gradient(90deg, #1b1f23 50%, #2a2e33 50%);
   border-radius:8px;
   box-shadow:0 12px 30px rgba(0,0,0,0.18);
@@ -64,11 +64,31 @@
 }
 .checkbox{
   width:18px; height:18px; border:2px solid #bfc5cc; border-radius:3px; display:inline-block;
+  position:relative;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
 }
 
-.checked::after{
-  content:""; position:absolute; left:4px; top:0px; width:6px; height:12px;
-  border:2px solid #2a2e33; border-top:none; border-left:none; transform:rotate(45deg);
+.checkedLong{
+  border-color: #4a9c52;
+  background-color: rgba(74, 156, 82, 0.1);
+}
+
+.checkedLong::after{
+  content:""; position:absolute; left:4px; top:1px; width:6px; height:12px;
+  border:2px solid #4a9c52; border-top:none; border-left:none; transform:rotate(45deg);
+}
+
+.checkedShort{
+  border-color: #e74c3c;
+  background-color: rgba(231, 76, 60, 0.1);
+}
+
+.checkedShort::after{
+  content:""; position:absolute; left:4px; top:1px; width:6px; height:12px;
+  border:2px solid #e74c3c; border-top:none; border-left:none; transform:rotate(45deg);
 }
 
 .inputRow{
