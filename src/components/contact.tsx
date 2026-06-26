@@ -45,7 +45,7 @@ const Contact: React.FC = () => {
     <section className={styles.contact}>
       <div className="container">
         <h2 className={styles.title}>Contact Us</h2>
-        <p className={styles.subtitle}>Get in touch with the TradeSmart team</p>
+        <p className={styles.subtitle}>Get in touch with the TradeCal. Feel Free to give your Suggestions on what to improve. </p>
         
         {status === 'success' && (
           <div className={styles.successMessage}>

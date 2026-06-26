@@ -1,12 +1,12 @@
 .frame{
   width:min(560px, 100%);
-  aspect-ratio: 1 / 0.85;
+  min-height: 500px;
   background:linear-gradient(90deg, #ffffff 50%, #f9fafb 50%);
   border-radius:12px;
   box-shadow:0 8px 24px rgba(0,0,0,0.08);
   display:grid;
   grid-template-columns: 1fr 1fr;
-  overflow:hidden;
+  overflow:visible;
   border:1px solid var(--border);
 }
 
@@ -146,6 +146,14 @@
   background:#f3f4f6;
   cursor:not-allowed;
   color:var(--muted);
+}
+
+.profit{
+  color: #22c55e;
+}
+
+.loss{
+  color: #ef4444;
 }
 
 @media (max-width: 600px){
