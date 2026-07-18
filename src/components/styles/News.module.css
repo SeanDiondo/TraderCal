@@ -1,0 +1,239 @@
+.news {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ffffff 0%, #dcfce7 25%, #f3f4f6 50%, #fee2e2 75%, #f9fafb 100%);
+  padding: 40px 0;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: #666;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.loading,
+.error,
+.noEvents {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.1rem;
+  color: #666;
+}
+
+.error {
+  color: #ef4444;
+}
+
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.fallbackNotice {
+  max-width: 900px;
+  margin: 0 auto 2rem;
+  padding: 1rem;
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 8px;
+  border-left: 4px solid #f59e0b;
+}
+
+.fallbackNotice p {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.fallbackNotice a {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.impactDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.highImpact {
+  background-color: #ef4444;
+}
+
+.mediumImpact {
+  background-color: #f59e0b;
+}
+
+.lowImpact {
+  background-color: #22c55e;
+}
+
+.unknownImpact {
+  background-color: #6b7280;
+}
+
+.eventsList {
+  display: grid;
+  gap: 1.5rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.eventCard {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.eventCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.eventHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.impactBadge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: white;
+}
+
+.country {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #333;
+  padding: 0.25rem 0.5rem;
+  background: #f3f4f6;
+  border-radius: 4px;
+}
+
+.currency {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #666;
+  padding: 0.25rem 0.5rem;
+  background: #f3f4f6;
+  border-radius: 4px;
+}
+
+.eventName {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0d1a26;
+  margin: 0 0 0.75rem 0;
+}
+
+.eventTime {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.date {
+  font-weight: 600;
+}
+
+.time {
+  color: #666;
+}
+
+.eventData {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.dataPoint {
+  text-align: center;
+}
+
+.dataLabel {
+  display: block;
+  font-size: 0.8rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dataValue {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.note {
+  max-width: 900px;
+  margin: 2rem auto 0;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  border-left: 4px solid #0056b3;
+}
+
+.note p {
+  font-size: 0.85rem;
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .eventsList {
+    grid-template-columns: 1fr;
+  }
+
+  .eventData {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .dataPoint {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    background: #f9fafb;
+    border-radius: 4px;
+  }
+}

@@ -39,6 +39,8 @@ const Navbar: React.FC = () => {
               <Link to="/calculator" onClick={() => setIsDropdownOpen(false)}>Forex/Indices Calculator</Link>
             </div>
           </div>
+          <Link to="/news">News</Link>
+          <Link to="/journal">Journal</Link>
           <Link to="/contact">Feedback</Link>
         </nav>
       </div>

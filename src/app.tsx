@@ -6,6 +6,8 @@ import Contact from "./components/contact";
 import Footer from "./components/footer";
 import ForexCalculator from "./components/forexCalculator";
 import LeverageCalculator from "./components/leverageCalculator";
+import News from "./components/news";
+import Journal from "./components/journal";
 
 const Home: React.FC = () => (
   <>
@@ -22,6 +24,8 @@ const App: React.FC = () => {
           <Route path="/" element={<Home />} />
           <Route path="/leverage-calculator" element={<LeverageCalculator />} />
           <Route path="/calculator" element={<ForexCalculator />} />
+          <Route path="/news" element={<News />} />
+          <Route path="/journal" element={<Journal />} />
           <Route path="/contact" element={<Contact />} />
         </Routes>
       </main>
