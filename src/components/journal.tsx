@@ -21,19 +21,34 @@ const Journal: React.FC = () => {
     usdToPhp: ''
   });
 
-  // Load trades from localStorage on mount
+  // Load trades from API on mount
   useEffect(() => {
-    const savedTrades = localStorage.getItem('tradingJournal');
-    if (savedTrades) {
-      setTrades(JSON.parse(savedTrades));
-    }
+    const fetchTrades = async () => {
+      try {
+        const response = await fetch('/api/journal');
+        const data = await response.json();
+        if (data.success) {
+          const formattedTrades = data.data.map((trade: any) => ({
+            id: trade.id.toString(),
+            date: trade.date,
+            pair: trade.pair,
+            pnlUsd: parseFloat(trade.pnlUsd),
+            usdToPhp: parseFloat(trade.usdToPhp),
+          }));
+          setTrades(formattedTrades);
+        }
+      } catch (error) {
+        console.error('Error fetching trades:', error);
+      }
+    };
+
+    fetchTrades();
   }, []);
 
   // Fetch real-time USD/PHP exchange rate
   useEffect(() => {
     const fetchExchangeRate = async () => {
       try {
-        // Using free exchange rate API
         const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
         const data = await response.json();
         if (data.rates && data.rates.PHP) {
@@ -42,59 +57,97 @@ const Journal: React.FC = () => {
         }
       } catch (error) {
         console.error('Failed to fetch exchange rate, using default:', error);
-        // Keep default rate if API fails
       }
     };
 
     fetchExchangeRate();
   }, []);
 
-  // Save trades to localStorage whenever they change
+  // Save trades to localStorage whenever they change (for backup)
   useEffect(() => {
     localStorage.setItem('tradingJournal', JSON.stringify(trades));
   }, [trades]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (editingId) {
-      // Update existing trade
-      setTrades(trades.map(trade => 
-        trade.id === editingId 
-          ? {
-              ...trade,
-              date: formData.date,
-              pair: formData.pair.toUpperCase(),
-              pnlUsd: parseFloat(formData.pnlUsd),
-              usdToPhp: parseFloat(formData.usdToPhp)
-            }
-          : trade
-      ));
-      setEditingId(null);
-    } else {
-      // Add new trade
-      const newTrade: Trade = {
-        id: Date.now().toString(),
-        date: formData.date || new Date().toISOString().split('T')[0],
-        pair: formData.pair.toUpperCase(),
-        pnlUsd: parseFloat(formData.pnlUsd),
-        usdToPhp: parseFloat(formData.usdToPhp)
-      };
+    try {
+      if (editingId) {
+        // Update existing trade via API
+        const response = await fetch(`/api/journal/${editingId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            date: formData.date,
+            pair: formData.pair,
+            pnlUsd: parseFloat(formData.pnlUsd),
+            usdToPhp: parseFloat(formData.usdToPhp),
+          }),
+        });
+        const data = await response.json();
+        if (data.success) {
+          setTrades(trades.map(trade => 
+            trade.id === editingId 
+              ? {
+                  ...trade,
+                  date: formData.date,
+                  pair: formData.pair.toUpperCase(),
+                  pnlUsd: parseFloat(formData.pnlUsd),
+                  usdToPhp: parseFloat(formData.usdToPhp)
+                }
+              : trade
+          ));
+          setEditingId(null);
+        }
+      } else {
+        // Add new trade via API
+        const response = await fetch('/api/journal', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            date: formData.date,
+            pair: formData.pair,
+            pnlUsd: parseFloat(formData.pnlUsd),
+            usdToPhp: parseFloat(formData.usdToPhp),
+          }),
+        });
+        const data = await response.json();
+        if (data.success) {
+          const newTrade: Trade = {
+            id: data.data.id.toString(),
+            date: formData.date || new Date().toISOString().split('T')[0],
+            pair: formData.pair.toUpperCase(),
+            pnlUsd: parseFloat(formData.pnlUsd),
+            usdToPhp: parseFloat(formData.usdToPhp)
+          };
+          setTrades([newTrade, ...trades]);
+        }
+      }
 
-      setTrades([newTrade, ...trades]);
+      setFormData({
+        date: '',
+        pair: '',
+        pnlUsd: '',
+        usdToPhp: usdToPhpRate.toString()
+      });
+      setShowForm(false);
+    } catch (error) {
+      console.error('Error saving trade:', error);
     }
-
-    setFormData({
-      date: '',
-      pair: '',
-      pnlUsd: '',
-      usdToPhp: usdToPhpRate.toString()
-    });
-    setShowForm(false);
   };
 
-  const deleteTrade = (id: string) => {
-    setTrades(trades.filter(trade => trade.id !== id));
+  const deleteTrade = async (id: string) => {
+    try {
+      const response = await fetch(`/api/journal/${id}`, {
+        method: 'DELETE',
+      });
+      const data = await response.json();
+      if (data.success) {
+        setTrades(trades.filter(trade => trade.id !== id));
+      }
+    } catch (error) {
+      console.error('Error deleting trade:', error);
+    }
   };
 
   const editTrade = (trade: Trade) => {
