@@ -1,10 +1,17 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styles from "./styles/navbar.module.css";
 
 const Navbar: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -16,6 +23,13 @@ const Navbar: React.FC = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setIsLoggedIn(false);
+    navigate('/');
+  };
 
   return (
     <header className={styles.header}>
@@ -40,8 +54,16 @@ const Navbar: React.FC = () => {
             </div>
           </div>
           <Link to="/news">News</Link>
-          <Link to="/journal">Journal</Link>
+          {isLoggedIn && <Link to="/journal">Journal</Link>}
           <Link to="/contact">Feedback</Link>
+          {isLoggedIn ? (
+            <button onClick={handleLogout} className={styles.logoutButton}>Logout</button>
+          ) : (
+            <>
+              <Link to="/login" className={styles.authLink}>Login</Link>
+              <Link to="/register" className={styles.authLink}>Register</Link>
+            </>
+          )}
         </nav>
       </div>
     </header>

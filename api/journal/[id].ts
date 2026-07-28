@@ -1,8 +1,26 @@
 import { db } from '../../src/db';
 import { journal } from '../../src/db/schema';
 import { eq } from 'drizzle-orm';
+import jwt from 'jsonwebtoken';
+
+function verifyToken(req: any) {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (!token) return null;
+  
+  try {
+    return jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as any;
+  } catch {
+    return null;
+  }
+}
 
 export default async function handler(req: any, res: any) {
+  const user = verifyToken(req);
+  
+  if (!user) {
+    return res.status(401).json({ success: false, message: 'Unauthorized' });
+  }
+
   const { id } = req.query;
 
   if (req.method === 'PUT') {

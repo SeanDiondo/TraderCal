@@ -1,11 +1,29 @@
 import { db } from '../src/db';
 import { journal } from '../src/db/schema';
 import { eq } from 'drizzle-orm';
+import jwt from 'jsonwebtoken';
+
+function verifyToken(req: any) {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (!token) return null;
+  
+  try {
+    return jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as any;
+  } catch {
+    return null;
+  }
+}
 
 export default async function handler(req: any, res: any) {
+  const user = verifyToken(req);
+  
+  if (!user) {
+    return res.status(401).json({ success: false, message: 'Unauthorized' });
+  }
+
   if (req.method === 'GET') {
     try {
-      const entries = await db.select().from(journal).orderBy(journal.createdAt);
+      const entries = await db.select().from(journal).where(eq(journal.userId, user.userId)).orderBy(journal.createdAt);
       res.status(200).json({ success: true, data: entries });
     } catch (error) {
       console.error('Error fetching journal entries:', error);
@@ -16,6 +34,7 @@ export default async function handler(req: any, res: any) {
       const { date, pair, pnlUsd, usdToPhp } = req.body;
 
       const result = await db.insert(journal).values({
+        userId: user.userId,
         date,
         pair: pair.toUpperCase(),
         pnlUsd: pnlUsd.toString(),

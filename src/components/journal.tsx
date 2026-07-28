@@ -25,7 +25,12 @@ const Journal: React.FC = () => {
   useEffect(() => {
     const fetchTrades = async () => {
       try {
-        const response = await fetch('/api/journal');
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/journal', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
         const data = await response.json();
         if (data.success) {
           const formattedTrades = data.data.map((trade: any) => ({
@@ -36,6 +41,8 @@ const Journal: React.FC = () => {
             usdToPhp: parseFloat(trade.usdToPhp),
           }));
           setTrades(formattedTrades);
+        } else if (data.message === 'Unauthorized') {
+          window.location.href = '/login';
         }
       } catch (error) {
         console.error('Error fetching trades:', error);
@@ -72,11 +79,16 @@ const Journal: React.FC = () => {
     e.preventDefault();
     
     try {
+      const token = localStorage.getItem('token');
+      
       if (editingId) {
         // Update existing trade via API
         const response = await fetch(`/api/journal/${editingId}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
           body: JSON.stringify({
             date: formData.date,
             pair: formData.pair,
@@ -98,12 +110,17 @@ const Journal: React.FC = () => {
               : trade
           ));
           setEditingId(null);
+        } else if (data.message === 'Unauthorized') {
+          window.location.href = '/login';
         }
       } else {
         // Add new trade via API
         const response = await fetch('/api/journal', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
           body: JSON.stringify({
             date: formData.date,
             pair: formData.pair,
@@ -121,6 +138,8 @@ const Journal: React.FC = () => {
             usdToPhp: parseFloat(formData.usdToPhp)
           };
           setTrades([newTrade, ...trades]);
+        } else if (data.message === 'Unauthorized') {
+          window.location.href = '/login';
         }
       }
 
@@ -138,12 +157,18 @@ const Journal: React.FC = () => {
 
   const deleteTrade = async (id: string) => {
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch(`/api/journal/${id}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
       });
       const data = await response.json();
       if (data.success) {
         setTrades(trades.filter(trade => trade.id !== id));
+      } else if (data.message === 'Unauthorized') {
+        window.location.href = '/login';
       }
     } catch (error) {
       console.error('Error deleting trade:', error);

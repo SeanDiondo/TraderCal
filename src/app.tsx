@@ -8,6 +8,9 @@ import ForexCalculator from "./components/forexCalculator";
 import LeverageCalculator from "./components/leverageCalculator";
 import News from "./components/news";
 import Journal from "./components/journal";
+import Login from "./components/login";
+import Register from "./components/register";
+import ProtectedRoute from "./components/protectedRoute";
 
 const Home: React.FC = () => (
   <>
@@ -25,7 +28,9 @@ const App: React.FC = () => {
           <Route path="/leverage-calculator" element={<LeverageCalculator />} />
           <Route path="/calculator" element={<ForexCalculator />} />
           <Route path="/news" element={<News />} />
-          <Route path="/journal" element={<Journal />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/journal" element={<ProtectedRoute><Journal /></ProtectedRoute>} />
           <Route path="/contact" element={<Contact />} />
         </Routes>
       </main>

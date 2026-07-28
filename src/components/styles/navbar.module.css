@@ -23,17 +23,20 @@
   object-fit:contain;
 }
 .nav{
-  display:flex; gap:28px;
+  display:flex; gap:24px;
   align-items:center;
 }
 .nav a{
   font-weight:500; color:var(--text);
   transition:color 0.2s;
-  font-size:16px;
+  font-size:15px;
   line-height:1;
+  padding: 8px 12px;
+  border-radius: 6px;
 }
 .nav a:hover{
   color:var(--primary);
+  background: rgba(0,0,0,0.03);
 }
 
 .dropdown {
@@ -46,17 +49,19 @@
   font-weight: 500;
   color: var(--text);
   cursor: pointer;
-  padding: 0;
-  font-size: 16px;
+  padding: 8px 12px;
+  font-size: 15px;
   line-height: 1;
   display: flex;
   align-items: center;
   gap: 4px;
   transition: color 0.2s;
+  border-radius: 6px;
 }
 
 .dropdownToggle:hover {
   color: var(--primary);
+  background: rgba(0,0,0,0.03);
 }
 
 .dropdownToggle:focus {
@@ -143,4 +148,35 @@
 .dropdownMenu a:hover::before {
   opacity: 1;
   transform: translateX(0);
+}
+
+.authLink {
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: var(--text);
+  font-weight: 500;
+  font-size: 15px;
+  transition: all 0.2s;
+}
+
+.authLink:hover {
+  color: var(--primary);
+  background: rgba(0,0,0,0.03);
+}
+
+.logoutButton {
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: var(--text);
+  font-weight: 500;
+  font-size: 15px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  transition: all 0.2s;
+}
+
+.logoutButton:hover {
+  color: var(--primary);
+  background: rgba(0,0,0,0.03);
 }
