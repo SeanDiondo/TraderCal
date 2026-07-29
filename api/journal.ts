@@ -3,8 +3,8 @@ import { journal } from '../src/db/schema';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
 
-function verifyToken(req: any) {
-  const token = req.headers.authorization?.replace('Bearer ', '');
+function verifyToken(req: Request) {
+  const token = req.headers.get('authorization')?.replace('Bearer ', '');
   if (!token) return null;
   
   try {
@@ -14,39 +14,44 @@ function verifyToken(req: any) {
   }
 }
 
-export default async function handler(req: any, res: any) {
+export async function GET(req: Request) {
   const user = verifyToken(req);
   
   if (!user) {
-    return res.status(401).json({ success: false, message: 'Unauthorized' });
+    return Response.json({ success: false, message: 'Unauthorized' }, { status: 401 });
   }
 
-  if (req.method === 'GET') {
-    try {
-      const entries = await db.select().from(journal).where(eq(journal.userId, user.userId)).orderBy(journal.createdAt);
-      res.status(200).json({ success: true, data: entries });
-    } catch (error) {
-      console.error('Error fetching journal entries:', error);
-      res.status(500).json({ success: false, message: 'Error fetching journal entries' });
-    }
-  } else if (req.method === 'POST') {
-    try {
-      const { date, pair, pnlUsd, usdToPhp } = req.body;
+  try {
+    const entries = await db.select().from(journal).where(eq(journal.userId, user.userId)).orderBy(journal.createdAt);
+    return Response.json({ success: true, data: entries });
+  } catch (error) {
+    console.error('Error fetching journal entries:', error);
+    return Response.json({ success: false, message: 'Error fetching journal entries' }, { status: 500 });
+  }
+}
 
-      const result = await db.insert(journal).values({
-        userId: user.userId,
-        date,
-        pair: pair.toUpperCase(),
-        pnlUsd: pnlUsd.toString(),
-        usdToPhp: usdToPhp.toString(),
-      }).returning();
-      
-      res.status(201).json({ success: true, data: result[0] });
-    } catch (error) {
-      console.error('Error creating journal entry:', error);
-      res.status(500).json({ success: false, message: 'Error creating journal entry' });
-    }
-  } else {
-    res.status(405).json({ message: 'Method not allowed' });
+export async function POST(req: Request) {
+  const user = verifyToken(req);
+  
+  if (!user) {
+    return Response.json({ success: false, message: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const body = await req.json();
+    const { date, pair, pnlUsd, usdToPhp } = body;
+
+    const result = await db.insert(journal).values({
+      userId: user.userId,
+      date,
+      pair: pair.toUpperCase(),
+      pnlUsd: pnlUsd.toString(),
+      usdToPhp: usdToPhp.toString(),
+    }).returning();
+    
+    return Response.json({ success: true, data: result[0] }, { status: 201 });
+  } catch (error) {
+    console.error('Error creating journal entry:', error);
+    return Response.json({ success: false, message: 'Error creating journal entry' }, { status: 500 });
   }
 }
