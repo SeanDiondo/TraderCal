@@ -1,5 +1,5 @@
-import { db } from '../src/db';
-import { journal } from '../src/db/schema';
+import { db } from '../src/db/index.js';
+import { journal } from '../src/db/schema.js';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
 
