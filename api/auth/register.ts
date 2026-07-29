@@ -11,6 +11,10 @@ export default async function handler(req: any, res: any) {
   try {
     const { email, password, name } = req.body;
 
+    if (!email || !password || !name) {
+      return res.status(400).json({ success: false, message: 'Email, password, and name are required' });
+    }
+
     // Check if user already exists
     const existingUser = await db.select().from(users).where(eq(users.email, email));
     if (existingUser.length > 0) {
@@ -34,6 +38,6 @@ export default async function handler(req: any, res: any) {
     });
   } catch (error) {
     console.error('Error registering user:', error);
-    res.status(500).json({ success: false, message: 'Error registering user' });
+    res.status(500).json({ success: false, message: 'Error registering user', error: String(error) });
   }
 }

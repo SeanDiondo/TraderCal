@@ -12,6 +12,10 @@ export default async function handler(req: any, res: any) {
   try {
     const { email, password } = req.body;
 
+    if (!email || !password) {
+      return res.status(400).json({ success: false, message: 'Email and password are required' });
+    }
+
     // Find user
     const user = await db.select().from(users).where(eq(users.email, email));
     if (user.length === 0) {
@@ -25,9 +29,15 @@ export default async function handler(req: any, res: any) {
     }
 
     // Generate JWT token
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      console.error('JWT_SECRET is not configured');
+      return res.status(500).json({ success: false, message: 'Server configuration error' });
+    }
+
     const token = jwt.sign(
       { userId: user[0].id, email: user[0].email },
-      process.env.JWT_SECRET || 'your-secret-key',
+      jwtSecret,
       { expiresIn: '7d' }
     );
 
@@ -38,6 +48,6 @@ export default async function handler(req: any, res: any) {
     });
   } catch (error) {
     console.error('Error logging in:', error);
-    res.status(500).json({ success: false, message: 'Error logging in' });
+    res.status(500).json({ success: false, message: 'Error logging in', error: String(error) });
   }
 }
