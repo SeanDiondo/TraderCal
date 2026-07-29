@@ -93,7 +93,7 @@ const Journal: React.FC = () => {
             date: formData.date,
             pair: formData.pair,
             pnlUsd: parseFloat(formData.pnlUsd),
-            usdToPhp: parseFloat(formData.usdToPhp),
+            usdToPhp: usdToPhpRate,
           }),
         });
         const data = await response.json();
@@ -105,7 +105,7 @@ const Journal: React.FC = () => {
                   date: formData.date,
                   pair: formData.pair.toUpperCase(),
                   pnlUsd: parseFloat(formData.pnlUsd),
-                  usdToPhp: parseFloat(formData.usdToPhp)
+                  usdToPhp: usdToPhpRate
                 }
               : trade
           ));
@@ -125,7 +125,7 @@ const Journal: React.FC = () => {
             date: formData.date,
             pair: formData.pair,
             pnlUsd: parseFloat(formData.pnlUsd),
-            usdToPhp: parseFloat(formData.usdToPhp),
+            usdToPhp: usdToPhpRate,
           }),
         });
         const data = await response.json();
@@ -135,7 +135,7 @@ const Journal: React.FC = () => {
             date: formData.date || new Date().toISOString().split('T')[0],
             pair: formData.pair.toUpperCase(),
             pnlUsd: parseFloat(formData.pnlUsd),
-            usdToPhp: parseFloat(formData.usdToPhp)
+            usdToPhp: usdToPhpRate
           };
           setTrades([newTrade, ...trades]);
         } else if (data.message === 'Unauthorized') {
@@ -244,6 +244,10 @@ const Journal: React.FC = () => {
             <span className={styles.statValue}>₱{stats.totalPhp.toFixed(2)}</span>
           </div>
           <div className={styles.statItem}>
+            <span className={styles.statLabel}>USD/PHP Rate:</span>
+            <span className={styles.statValue}>{usdToPhpRate.toFixed(4)}</span>
+          </div>
+          <div className={styles.statItem}>
             <span className={styles.statLabel}>Win Rate:</span>
             <span className={styles.statValue}>{stats.winRate.toFixed(1)}%</span>
           </div>
@@ -291,15 +295,6 @@ const Journal: React.FC = () => {
                 placeholder="PnL USD"
                 value={formData.pnlUsd}
                 onChange={(e) => setFormData({...formData, pnlUsd: e.target.value})}
-                required
-                className={styles.formInput}
-              />
-              <input
-                type="number"
-                step="0.0001"
-                placeholder="USD/PHP"
-                value={formData.usdToPhp}
-                onChange={(e) => setFormData({...formData, usdToPhp: e.target.value})}
                 required
                 className={styles.formInput}
               />
