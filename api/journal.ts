@@ -14,44 +14,42 @@ function verifyToken(req: Request) {
   }
 }
 
-export async function GET(req: Request) {
+export default async function handler(req: Request) {
   const user = verifyToken(req);
   
   if (!user) {
     return Response.json({ success: false, message: 'Unauthorized' }, { status: 401 });
   }
 
-  try {
-    const entries = await db.select().from(journal).where(eq(journal.userId, user.userId)).orderBy(journal.createdAt);
-    return Response.json({ success: true, data: entries });
-  } catch (error) {
-    console.error('Error fetching journal entries:', error);
-    return Response.json({ success: false, message: 'Error fetching journal entries' }, { status: 500 });
-  }
-}
+  const method = req.method;
 
-export async function POST(req: Request) {
-  const user = verifyToken(req);
-  
-  if (!user) {
-    return Response.json({ success: false, message: 'Unauthorized' }, { status: 401 });
-  }
+  if (method === 'GET') {
+    try {
+      const entries = await db.select().from(journal).where(eq(journal.userId, user.userId)).orderBy(journal.createdAt);
+      return Response.json({ success: true, data: entries });
+    } catch (error) {
+      console.error('Error fetching journal entries:', error);
+      return Response.json({ success: false, message: 'Error fetching journal entries' }, { status: 500 });
+    }
+  } else if (method === 'POST') {
+    try {
+      const body = await req.json();
+      const { date, pair, pnlUsd, usdToPhp } = body;
 
-  try {
-    const body = await req.json();
-    const { date, pair, pnlUsd, usdToPhp } = body;
-
-    const result = await db.insert(journal).values({
-      userId: user.userId,
-      date,
-      pair: pair.toUpperCase(),
-      pnlUsd: pnlUsd.toString(),
-      usdToPhp: usdToPhp.toString(),
-    }).returning();
-    
-    return Response.json({ success: true, data: result[0] }, { status: 201 });
-  } catch (error) {
-    console.error('Error creating journal entry:', error);
-    return Response.json({ success: false, message: 'Error creating journal entry' }, { status: 500 });
+      const result = await db.insert(journal).values({
+        userId: user.userId,
+        date,
+        pair: pair.toUpperCase(),
+        pnlUsd: pnlUsd.toString(),
+        usdToPhp: usdToPhp.toString(),
+      }).returning();
+      
+      return Response.json({ success: true, data: result[0] }, { status: 201 });
+    } catch (error) {
+      console.error('Error creating journal entry:', error);
+      return Response.json({ success: false, message: 'Error creating journal entry' }, { status: 500 });
+    }
+  } else {
+    return Response.json({ success: false, message: 'Method not allowed' }, { status: 405 });
   }
 }

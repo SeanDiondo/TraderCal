@@ -4,7 +4,13 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { eq } from 'drizzle-orm';
 
-export async function POST(req: Request) {
+export default async function handler(req: Request) {
+  const method = req.method;
+
+  if (method !== 'POST') {
+    return Response.json({ success: false, message: 'Method not allowed' }, { status: 405 });
+  }
+
   try {
     const body = await req.json();
     const { email, password } = body;
