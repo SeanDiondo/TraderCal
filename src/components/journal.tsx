@@ -189,29 +189,6 @@ const Journal: React.FC = () => {
     setShowForm(true);
   };
 
-  const calculateStats = () => {
-    if (trades.length === 0) {
-      return { totalTrades: 0, totalPnlUsd: 0, totalUsd: 0, totalPhp: 0, winRate: 0 };
-    }
-
-    const totalPnlUsd = trades.reduce((sum, t) => sum + t.pnlUsd, 0);
-    const totalUsd = totalPnlUsd; // Total USD is the sum of all PnL
-    const avgUsdToPhp = trades.reduce((sum, t) => sum + t.usdToPhp, 0) / trades.length;
-    const totalPhp = totalUsd * avgUsdToPhp;
-    const wins = trades.filter(t => t.pnlUsd > 0).length;
-    const winRate = (wins / trades.length) * 100;
-
-    return {
-      totalTrades: trades.length,
-      totalPnlUsd,
-      totalUsd,
-      totalPhp,
-      winRate
-    };
-  };
-
-  const stats = calculateStats();
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
