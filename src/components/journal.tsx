@@ -159,6 +159,9 @@ const Journal: React.FC = () => {
   };
 
   const deleteTrade = async (id: string) => {
+    const confirmed = window.confirm('Are you sure you want to delete this trade?');
+    if (!confirmed) return;
+
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`/api/journal/${id}`, {
@@ -172,9 +175,12 @@ const Journal: React.FC = () => {
         setTrades(trades.filter(trade => trade.id !== id));
       } else if (data.message === 'Unauthorized') {
         window.location.href = '/login';
+      } else {
+        alert('Failed to delete trade. Please try again.');
       }
     } catch (error) {
       console.error('Error deleting trade:', error);
+      alert('Error deleting trade. Please try again.');
     }
   };
 
