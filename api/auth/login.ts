@@ -4,35 +4,32 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { eq } from 'drizzle-orm';
 
-export default async function handler(req: any, res: any) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, message: 'Method not allowed' });
-  }
-
+export async function POST(req: Request) {
   try {
-    const { email, password } = req.body;
+    const body = await req.json();
+    const { email, password } = body;
 
     if (!email || !password) {
-      return res.status(400).json({ success: false, message: 'Email and password are required' });
+      return Response.json({ success: false, message: 'Email and password are required' }, { status: 400 });
     }
 
     // Find user
     const user = await db.select().from(users).where(eq(users.email, email));
     if (user.length === 0) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+      return Response.json({ success: false, message: 'Invalid credentials' }, { status: 401 });
     }
 
     // Check password
     const isValidPassword = await bcrypt.compare(password, user[0].password);
     if (!isValidPassword) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+      return Response.json({ success: false, message: 'Invalid credentials' }, { status: 401 });
     }
 
     // Generate JWT token
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
       console.error('JWT_SECRET is not configured');
-      return res.status(500).json({ success: false, message: 'Server configuration error' });
+      return Response.json({ success: false, message: 'Server configuration error' }, { status: 500 });
     }
 
     const token = jwt.sign(
@@ -41,13 +38,13 @@ export default async function handler(req: any, res: any) {
       { expiresIn: '7d' }
     );
 
-    res.status(200).json({ 
+    return Response.json({ 
       success: true, 
       token,
       user: { id: user[0].id, email: user[0].email, name: user[0].name }
     });
   } catch (error) {
     console.error('Error logging in:', error);
-    res.status(500).json({ success: false, message: 'Error logging in', error: String(error) });
+    return Response.json({ success: false, message: 'Error logging in', error: String(error) }, { status: 500 });
   }
 }
