@@ -354,68 +354,112 @@ const Journal: React.FC = () => {
           </div>
         </div>
 
-        {/* Month Filter and Chart Controls */}
-        <div className={styles.controlsBar}>
-          <div className={styles.filterSection}>
-            <label className={styles.filterLabel}>Filter by Month:</label>
-            <select 
-              className={styles.monthSelect}
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-            >
-              <option value="all">All Time ({trades.length} trades)</option>
-              {getAvailableMonths().map(({ month, count }) => (
-                <option key={month} value={month}>
-                  {new Date(month + '-01').toLocaleDateString('en-US', { year: 'numeric', month: 'long' })} 
-                  {count > 0 ? ` (${count} trades)` : ' (No trades)'}
-                </option>
-              ))}
-            </select>
-            {selectedMonth !== 'all' && (
-              <span className={styles.monthIndicator}>
-                {selectedMonth === getAvailableMonths()[0]?.month && getAvailableMonths()[0]?.count === 0 
-                  ? '📝 Ready to add trades' 
-                  : '✓ Active month'}
-              </span>
-            )}
-          </div>
-          <div className={styles.chartToggle}>
-            <button 
-              className={`${styles.chartButton} ${chartView === 'weekly' ? styles.active : ''}`}
-              onClick={() => setChartView('weekly')}
-            >
-              Weekly
-            </button>
-            <button 
-              className={`${styles.chartButton} ${chartView === 'monthly' ? styles.active : ''}`}
-              onClick={() => setChartView('monthly')}
-            >
-              Monthly
-            </button>
-          </div>
-        </div>
-
-        {/* Selected Month Summary */}
-        {selectedMonth !== 'all' && (
-          <div className={styles.monthSummary}>
-            <h3 className={styles.monthSummaryTitle}>
-              {new Date(selectedMonth + '-01').toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}
-            </h3>
-            <div className={styles.monthSummaryStats}>
-              <span className={styles.monthSummaryStat}>
-                Trades: {filteredTrades.length}
-              </span>
-              <span className={styles.monthSummaryStat}>
-                PnL: ${filteredTrades.reduce((sum, t) => sum + t.pnlUsd, 0).toFixed(2)}
-              </span>
-              <span className={styles.monthSummaryStat}>
-                Win Rate: {filteredTrades.length > 0 
-                  ? ((filteredTrades.filter(t => t.pnlUsd > 0).length / filteredTrades.length) * 100).toFixed(1) 
-                  : '0'}%
-              </span>
+        {/* Month Cards Section */}
+        <div className={styles.monthsSection}>
+          <div className={styles.monthsHeader}>
+            <h2 className={styles.monthsTitle}>Month Journals</h2>
+            <div className={styles.monthsHeaderActions}>
+              <button 
+                className={`${styles.chartButton} ${chartView === 'weekly' ? styles.active : ''}`}
+                onClick={() => setChartView('weekly')}
+              >
+                Weekly
+              </button>
+              <button 
+                className={`${styles.chartButton} ${chartView === 'monthly' ? styles.active : ''}`}
+                onClick={() => setChartView('monthly')}
+              >
+                Monthly
+              </button>
+              <button 
+                className={styles.createMonthButton}
+                onClick={() => {
+                  const nextMonthDate = new Date();
+                  nextMonthDate.setMonth(nextMonthDate.getMonth() + 1);
+                  const nextMonth = `${nextMonthDate.getFullYear()}-${String(nextMonthDate.getMonth() + 1).padStart(2, '0')}`;
+                  setSelectedMonth(nextMonth);
+                }}
+              >
+                + Create New Month
+              </button>
             </div>
           </div>
-        )}
+          
+          <div className={styles.monthCardsGrid}>
+            {/* All Time Card */}
+            <div 
+              className={`${styles.monthCard} ${selectedMonth === 'all' ? styles.active : ''}`}
+              onClick={() => setSelectedMonth('all')}
+            >
+              <div className={styles.monthCardHeader}>
+                <h3 className={styles.monthCardTitle}>All Time</h3>
+                <span className={styles.monthCardBadge}>{trades.length} trades</span>
+              </div>
+              <div className={styles.monthCardStats}>
+                <div className={styles.monthCardStat}>
+                  <span className={styles.monthCardStatLabel}>Total PnL</span>
+                  <span className={`${styles.monthCardStatValue} ${stats.totalPnlUsd >= 0 ? styles.profit : styles.loss}`}>
+                    ${stats.totalPnlUsd.toFixed(2)}
+                  </span>
+                </div>
+                <div className={styles.monthCardStat}>
+                  <span className={styles.monthCardStatLabel}>Win Rate</span>
+                  <span className={styles.monthCardStatValue}>{stats.winRate.toFixed(1)}%</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Month Cards */}
+            {getAvailableMonths().map(({ month, count }) => (
+              <div 
+                key={month}
+                className={`${styles.monthCard} ${selectedMonth === month ? styles.active : ''} ${count === 0 ? styles.emptyMonth : ''}`}
+                onClick={() => setSelectedMonth(month)}
+              >
+                <div className={styles.monthCardHeader}>
+                  <h3 className={styles.monthCardTitle}>
+                    {new Date(month + '-01').toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}
+                  </h3>
+                  <span className={`${styles.monthCardBadge} ${count === 0 ? styles.emptyBadge : ''}`}>
+                    {count > 0 ? `${count} trades` : 'Empty'}
+                  </span>
+                </div>
+                {count > 0 ? (
+                  <div className={styles.monthCardStats}>
+                    <div className={styles.monthCardStat}>
+                      <span className={styles.monthCardStatLabel}>PnL</span>
+                      <span className={`${styles.monthCardStatValue} ${trades.filter(t => {
+                        const date = new Date(t.date);
+                        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                        return monthKey === month;
+                      }).reduce((sum, t) => sum + t.pnlUsd, 0) >= 0 ? styles.profit : styles.loss}`}>
+                        ${trades.filter(t => {
+                          const date = new Date(t.date);
+                          const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                          return monthKey === month;
+                        }).reduce((sum, t) => sum + t.pnlUsd, 0).toFixed(2)}
+                      </span>
+                    </div>
+                    <div className={styles.monthCardStat}>
+                      <span className={styles.monthCardStatLabel}>Win Rate</span>
+                      <span className={styles.monthCardStatValue}>
+                        {((trades.filter(t => {
+                          const date = new Date(t.date);
+                          const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                          return monthKey === month;
+                        }).filter(t => t.pnlUsd > 0).length / count) * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className={styles.monthCardEmpty}>
+                    <span className={styles.monthCardEmptyText}>📝 Ready to add trades</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* Chart Section */}
         <div className={styles.chartSection}>

@@ -306,69 +306,24 @@
   background: #f9fafb;
 }
 
-.controlsBar {
+.monthsSection {
+  margin-bottom: 2rem;
+}
+
+.monthsHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   flex-wrap: wrap;
   gap: 1rem;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 1rem 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.filterSection {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.filterLabel {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #666;
-}
-
-.monthIndicator {
-  font-size: 0.85rem;
-  padding: 0.25rem 0.75rem;
-  border-radius: 4px;
-  background: #f0fdf4;
-  color: #16a34a;
-  font-weight: 600;
-}
-
-.monthSelect {
-  padding: 0.5rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  background: white;
-  cursor: pointer;
-  transition: border-color 0.2s;
-  min-width: 200px;
-}
-
-.monthSelect:focus {
-  outline: none;
-  border-color: #667eea;
-}
-
-.monthSelect option {
-  padding: 0.5rem;
-}
-
-.monthSelect option[value="all"] {
-  font-weight: 700;
-  color: #1a1a2e;
-}
-
-.chartToggle {
+.monthsHeaderActions {
   display: flex;
   gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .chartButton {
@@ -392,6 +347,124 @@
   background: #667eea;
   color: white;
   border-color: #667eea;
+}
+
+.monthsTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.createMonthButton {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.createMonthButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.monthCardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.monthCard {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.monthCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.monthCard.active {
+  border-color: #667eea;
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.monthCard.emptyMonth {
+  border-style: dashed;
+  border-color: #d1d5db;
+}
+
+.monthCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.monthCardTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.monthCardBadge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  background: #667eea;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.monthCardBadge.emptyBadge {
+  background: #d1d5db;
+  color: #666;
+}
+
+.monthCardStats {
+  display: flex;
+  gap: 1rem;
+}
+
+.monthCardStat {
+  flex: 1;
+}
+
+.monthCardStatLabel {
+  display: block;
+  font-size: 0.8rem;
+  color: #666;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.monthCardStatValue {
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.monthCardEmpty {
+  padding: 1rem 0;
+  text-align: center;
+}
+
+.monthCardEmptyText {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 600;
 }
 
 .chartSection {
@@ -452,8 +525,14 @@
 }
 
 @media (max-width: 768px) {
-  .title {
-    font-size: 1.5rem;
+  .chartSection {
+    .chartTitle {
+      font-size: 1.5rem;
+    }
+
+    .chartContainer {
+      height: 250px;
+    }
   }
 
   .statsBar {
@@ -477,5 +556,18 @@
   .spreadsheet th,
   .spreadsheet td {
     padding: 0.5rem;
+  }
+
+  .monthsHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .monthsHeaderActions {
+    width: 100%;
+  }
+
+  .monthCardsGrid {
+    grid-template-columns: 1fr;
   }
 }
