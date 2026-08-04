@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import styles from "./styles/Journal.module.css";
 
 interface Trade {
@@ -13,7 +14,9 @@ const Journal: React.FC = () => {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [usdToPhpRate, setUsdToPhpRate] = useState<number>(56.50); // Default rate
+  const [usdToPhpRate, setUsdToPhpRate] = useState<number>(56.50);
+  const [selectedMonth, setSelectedMonth] = useState<string>('all');
+  const [chartView, setChartView] = useState<'weekly' | 'monthly'>('weekly');
   const [formData, setFormData] = useState({
     date: '',
     pair: '',
@@ -217,6 +220,100 @@ const Journal: React.FC = () => {
     });
   };
 
+  // Get unique months from trades
+  const getAvailableMonths = () => {
+    const months = new Set(trades.map(trade => {
+      const date = new Date(trade.date);
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+    }));
+    return Array.from(months).sort().reverse();
+  };
+
+  // Filter trades by selected month
+  const getFilteredTrades = () => {
+    if (selectedMonth === 'all') return trades;
+    return trades.filter(trade => {
+      const date = new Date(trade.date);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      return monthKey === selectedMonth;
+    });
+  };
+
+  const filteredTrades = getFilteredTrades();
+
+  // Calculate stats for filtered trades
+  const calculateStats = (tradeList: Trade[]) => {
+    if (tradeList.length === 0) {
+      return { totalTrades: 0, totalPnlUsd: 0, totalUsd: 0, totalPhp: 0, winRate: 0 };
+    }
+
+    const totalPnlUsd = tradeList.reduce((sum, t) => sum + t.pnlUsd, 0);
+    const totalUsd = totalPnlUsd;
+    const avgUsdToPhp = tradeList.reduce((sum, t) => sum + t.usdToPhp, 0) / tradeList.length;
+    const totalPhp = totalUsd * avgUsdToPhp;
+    const wins = tradeList.filter(t => t.pnlUsd > 0).length;
+    const winRate = (wins / tradeList.length) * 100;
+
+    return {
+      totalTrades: tradeList.length,
+      totalPnlUsd,
+      totalUsd,
+      totalPhp,
+      winRate
+    };
+  };
+
+  const stats = calculateStats(filteredTrades);
+
+  // Prepare weekly chart data
+  const getWeeklyChartData = () => {
+    const weeklyData: { [key: string]: { pnl: number } } = {};
+    
+    filteredTrades.forEach(trade => {
+      const date = new Date(trade.date);
+      const weekStart = new Date(date);
+      weekStart.setDate(date.getDate() - date.getDay());
+      const weekKey = weekStart.toISOString().split('T')[0];
+      
+      if (!weeklyData[weekKey]) {
+        weeklyData[weekKey] = { pnl: 0 };
+      }
+      weeklyData[weekKey].pnl += trade.pnlUsd;
+    });
+
+    return Object.entries(weeklyData)
+      .map(([date, data]) => ({
+        date: formatDate(date),
+        pnl: data.pnl
+      }))
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  };
+
+  // Prepare monthly chart data
+  const getMonthlyChartData = () => {
+    const monthlyData: { [key: string]: { pnl: number } } = {};
+    
+    trades.forEach(trade => {
+      const date = new Date(trade.date);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      
+      if (!monthlyData[monthKey]) {
+        monthlyData[monthKey] = { pnl: 0 };
+      }
+      monthlyData[monthKey].pnl += trade.pnlUsd;
+    });
+
+    return Object.entries(monthlyData)
+      .map(([date, data]) => ({
+        date: date,
+        pnl: data.pnl
+      }))
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  };
+
+  const weeklyChartData = getWeeklyChartData();
+  const monthlyChartData = getMonthlyChartData();
+
   return (
     <div className={styles.journal}>
       <div className="container">
@@ -250,6 +347,73 @@ const Journal: React.FC = () => {
           <div className={styles.statItem}>
             <span className={styles.statLabel}>Win Rate:</span>
             <span className={styles.statValue}>{stats.winRate.toFixed(1)}%</span>
+          </div>
+        </div>
+
+        {/* Month Filter and Chart Controls */}
+        <div className={styles.controlsBar}>
+          <div className={styles.filterSection}>
+            <label className={styles.filterLabel}>Filter by Month:</label>
+            <select 
+              className={styles.monthSelect}
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+            >
+              <option value="all">All Time</option>
+              {getAvailableMonths().map(month => (
+                <option key={month} value={month}>
+                  {new Date(month + '-01').toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className={styles.chartToggle}>
+            <button 
+              className={`${styles.chartButton} ${chartView === 'weekly' ? styles.active : ''}`}
+              onClick={() => setChartView('weekly')}
+            >
+              Weekly
+            </button>
+            <button 
+              className={`${styles.chartButton} ${chartView === 'monthly' ? styles.active : ''}`}
+              onClick={() => setChartView('monthly')}
+            >
+              Monthly
+            </button>
+          </div>
+        </div>
+
+        {/* Chart Section */}
+        <div className={styles.chartSection}>
+          <h3 className={styles.chartTitle}>
+            {chartView === 'weekly' ? 'Weekly PnL' : 'Monthly PnL'}
+          </h3>
+          <div className={styles.chartContainer}>
+            <ResponsiveContainer width="100%" height={300}>
+              {chartView === 'weekly' ? (
+                <LineChart data={weeklyChartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" />
+                  <YAxis />
+                  <Tooltip />
+                  <Line 
+                    type="monotone" 
+                    dataKey="pnl" 
+                    stroke="#667eea" 
+                    strokeWidth={2}
+                    dot={{ fill: '#667eea' }}
+                  />
+                </LineChart>
+              ) : (
+                <BarChart data={monthlyChartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="pnl" fill="#667eea" />
+                </BarChart>
+              )}
+            </ResponsiveContainer>
           </div>
         </div>
 
@@ -318,14 +482,16 @@ const Journal: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {trades.length === 0 ? (
+              {filteredTrades.length === 0 ? (
                 <tr>
                   <td colSpan={5} className={styles.noTrades}>
-                    No trades recorded yet. Click "Add Trade" to start tracking.
+                    {selectedMonth === 'all' 
+                      ? 'No trades recorded yet. Click "Add Trade" to start tracking.'
+                      : 'No trades for this month. Select a different month or add a new trade.'}
                   </td>
                 </tr>
               ) : (
-                trades.map((trade) => (
+                filteredTrades.map((trade) => (
                   <tr key={trade.id} className={trade.pnlUsd >= 0 ? styles.profitRow : styles.lossRow}>
                     <td>{formatDate(trade.date)}</td>
                     <td className={styles.pairCell}>{trade.pair}</td>
