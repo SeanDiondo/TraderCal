@@ -203,6 +203,18 @@ const Journal: React.FC = () => {
       const date = new Date(trade.date);
       return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
     }));
+    
+    // Add current month to allow adding trades for current month
+    const currentDate = new Date();
+    const currentMonth = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+    months.add(currentMonth);
+    
+    // Add next month to allow planning ahead
+    const nextMonthDate = new Date(currentDate);
+    nextMonthDate.setMonth(nextMonthDate.getMonth() + 1);
+    const nextMonth = `${nextMonthDate.getFullYear()}-${String(nextMonthDate.getMonth() + 1).padStart(2, '0')}`;
+    months.add(nextMonth);
+    
     return Array.from(months).sort().reverse();
   };
 
