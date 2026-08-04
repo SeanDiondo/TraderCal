@@ -203,25 +203,34 @@ const Journal: React.FC = () => {
     });
   };
 
-  // Get unique months from trades
+  // Get unique months from trades with trade counts
   const getAvailableMonths = () => {
-    const months = new Set(trades.map(trade => {
+    const monthCounts: { [key: string]: number } = {};
+    
+    trades.forEach(trade => {
       const date = new Date(trade.date);
-      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-    }));
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      monthCounts[monthKey] = (monthCounts[monthKey] || 0) + 1;
+    });
     
     // Add current month to allow adding trades for current month
     const currentDate = new Date();
     const currentMonth = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
-    months.add(currentMonth);
+    if (!monthCounts[currentMonth]) {
+      monthCounts[currentMonth] = 0;
+    }
     
     // Add next month to allow planning ahead
     const nextMonthDate = new Date(currentDate);
     nextMonthDate.setMonth(nextMonthDate.getMonth() + 1);
     const nextMonth = `${nextMonthDate.getFullYear()}-${String(nextMonthDate.getMonth() + 1).padStart(2, '0')}`;
-    months.add(nextMonth);
+    if (!monthCounts[nextMonth]) {
+      monthCounts[nextMonth] = 0;
+    }
     
-    return Array.from(months).sort().reverse();
+    return Array.from(Object.entries(monthCounts))
+      .map(([month, count]) => ({ month, count }))
+      .sort((a, b) => b.month.localeCompare(a.month));
   };
 
   // Filter trades by selected month
@@ -354,13 +363,21 @@ const Journal: React.FC = () => {
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
             >
-              <option value="all">All Time</option>
-              {getAvailableMonths().map(month => (
+              <option value="all">All Time ({trades.length} trades)</option>
+              {getAvailableMonths().map(({ month, count }) => (
                 <option key={month} value={month}>
-                  {new Date(month + '-01').toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}
+                  {new Date(month + '-01').toLocaleDateString('en-US', { year: 'numeric', month: 'long' })} 
+                  {count > 0 ? ` (${count} trades)` : ' (No trades)'}
                 </option>
               ))}
             </select>
+            {selectedMonth !== 'all' && (
+              <span className={styles.monthIndicator}>
+                {selectedMonth === getAvailableMonths()[0]?.month && getAvailableMonths()[0]?.count === 0 
+                  ? '📝 Ready to add trades' 
+                  : '✓ Active month'}
+              </span>
+            )}
           </div>
           <div className={styles.chartToggle}>
             <button 
@@ -377,6 +394,28 @@ const Journal: React.FC = () => {
             </button>
           </div>
         </div>
+
+        {/* Selected Month Summary */}
+        {selectedMonth !== 'all' && (
+          <div className={styles.monthSummary}>
+            <h3 className={styles.monthSummaryTitle}>
+              {new Date(selectedMonth + '-01').toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}
+            </h3>
+            <div className={styles.monthSummaryStats}>
+              <span className={styles.monthSummaryStat}>
+                Trades: {filteredTrades.length}
+              </span>
+              <span className={styles.monthSummaryStat}>
+                PnL: ${filteredTrades.reduce((sum, t) => sum + t.pnlUsd, 0).toFixed(2)}
+              </span>
+              <span className={styles.monthSummaryStat}>
+                Win Rate: {filteredTrades.length > 0 
+                  ? ((filteredTrades.filter(t => t.pnlUsd > 0).length / filteredTrades.length) * 100).toFixed(1) 
+                  : '0'}%
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Chart Section */}
         <div className={styles.chartSection}>
