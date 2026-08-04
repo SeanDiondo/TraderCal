@@ -15,7 +15,10 @@ const Journal: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [usdToPhpRate, setUsdToPhpRate] = useState<number>(56.50);
-  const [selectedMonth, setSelectedMonth] = useState<string>('all');
+  const [selectedMonth, setSelectedMonth] = useState<string>(() => {
+    const currentDate = new Date();
+    return `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+  });
   const [chartView, setChartView] = useState<'weekly' | 'monthly'>('weekly');
   const [formData, setFormData] = useState({
     date: '',
@@ -158,6 +161,17 @@ const Journal: React.FC = () => {
     }
   };
 
+  const addTrade = () => {
+    setEditingId(null);
+    setFormData({
+      date: new Date().toISOString().split('T')[0],
+      pair: '',
+      pnlUsd: '',
+      usdToPhp: usdToPhpRate.toString()
+    });
+    setShowForm(true);
+  };
+
   const deleteTrade = async (id: string) => {
     const confirmed = window.confirm('Are you sure you want to delete this trade?');
     if (!confirmed) return;
@@ -213,19 +227,11 @@ const Journal: React.FC = () => {
       monthCounts[monthKey] = (monthCounts[monthKey] || 0) + 1;
     });
     
-    // Add current month to allow adding trades for current month
+    // Add current month even if empty to allow adding trades for current month
     const currentDate = new Date();
     const currentMonth = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
     if (!monthCounts[currentMonth]) {
       monthCounts[currentMonth] = 0;
-    }
-    
-    // Add next month to allow planning ahead
-    const nextMonthDate = new Date(currentDate);
-    nextMonthDate.setMonth(nextMonthDate.getMonth() + 1);
-    const nextMonth = `${nextMonthDate.getFullYear()}-${String(nextMonthDate.getMonth() + 1).padStart(2, '0')}`;
-    if (!monthCounts[nextMonth]) {
-      monthCounts[nextMonth] = 0;
     }
     
     return Array.from(Object.entries(monthCounts))
@@ -371,17 +377,6 @@ const Journal: React.FC = () => {
               >
                 Monthly
               </button>
-              <button 
-                className={styles.createMonthButton}
-                onClick={() => {
-                  const nextMonthDate = new Date();
-                  nextMonthDate.setMonth(nextMonthDate.getMonth() + 1);
-                  const nextMonth = `${nextMonthDate.getFullYear()}-${String(nextMonthDate.getMonth() + 1).padStart(2, '0')}`;
-                  setSelectedMonth(nextMonth);
-                }}
-              >
-                + Create New Month
-              </button>
             </div>
           </div>
           
@@ -453,7 +448,7 @@ const Journal: React.FC = () => {
                   </div>
                 ) : (
                   <div className={styles.monthCardEmpty}>
-                    <span className={styles.monthCardEmptyText}>📝 Ready to add trades</span>
+                    <span className={styles.monthCardEmptyText}>No trades yet</span>
                   </div>
                 )}
               </div>
@@ -498,16 +493,7 @@ const Journal: React.FC = () => {
         {/* Add Trade Button */}
         <button 
           className={styles.addButton}
-          onClick={() => {
-            setShowForm(!showForm);
-            setEditingId(null);
-            setFormData({
-              date: '',
-              pair: '',
-              pnlUsd: '',
-              usdToPhp: usdToPhpRate.toString()
-            });
-          }}
+          onClick={addTrade}
         >
           {showForm ? 'Cancel' : '+ Add Trade'}
         </button>
