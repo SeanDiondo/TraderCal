@@ -58,7 +58,7 @@
 }
 
 .fallbackNotice a {
-  color: #0056b3;
+  color: #22c55e;
   text-decoration: underline;
 }
 
@@ -204,7 +204,7 @@
   padding: 1rem;
   background: rgba(255, 255, 255, 0.7);
   border-radius: 8px;
-  border-left: 4px solid #0056b3;
+  border-left: 4px solid #22c55e;
 }
 
 .note p {

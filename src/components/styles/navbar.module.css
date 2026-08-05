@@ -180,3 +180,27 @@
   color: var(--primary);
   background: rgba(0,0,0,0.03);
 }
+
+@media (max-width: 768px) {
+  .nav {
+    gap: 12px;
+  }
+
+  .nav a {
+    font-size: 14px;
+    padding: 6px 10px;
+  }
+
+  .logo {
+    font-size: 24px;
+  }
+
+  .logo img {
+    height: 32px;
+    max-width: 150px;
+  }
+
+  .dropdownMenu {
+    min-width: 200px;
+  }
+}

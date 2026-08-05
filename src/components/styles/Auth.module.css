@@ -61,7 +61,7 @@
 
 .input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #22c55e;
 }
 
 .button {
@@ -94,11 +94,25 @@
 }
 
 .switchAuth a {
-  color: #667eea;
+  color: #22c55e;
   text-decoration: none;
   font-weight: 600;
 }
 
 .switchAuth a:hover {
   text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .authCard {
+    padding: 30px 20px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .input {
+    font-size: 16px;
+  }
 }

@@ -68,7 +68,7 @@
   max-width: 200px;
   margin: 0 auto 2rem;
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #0056b3, #004494);
+  background: linear-gradient(135deg, #22c55e, #16a34a);
   color: white;
   border: none;
   border-radius: 6px;
@@ -80,7 +80,7 @@
 
 .addButton:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 86, 179, 0.3);
+  box-shadow: 0 6px 16px rgba(34, 197, 94, 0.3);
 }
 
 .form {
@@ -111,7 +111,7 @@
 
 .formInput:focus {
   outline: none;
-  border-color: #0056b3;
+  border-color: #22c55e;
 }
 
 .submitButton {
@@ -267,7 +267,7 @@
 
 .editButton {
   padding: 0.4rem 0.8rem;
-  background: #0056b3;
+  background: #22c55e;
   color: white;
   border: none;
   border-radius: 4px;
@@ -279,7 +279,7 @@
 }
 
 .editButton:hover {
-  background: #004494;
+  background: #16a34a;
 }
 
 .deleteButton {
@@ -339,14 +339,14 @@
 }
 
 .chartButton:hover {
-  border-color: #667eea;
-  color: #667eea;
+  border-color: #22c55e;
+  color: #22c55e;
 }
 
 .chartButton.active {
-  background: #667eea;
+  background: #22c55e;
   color: white;
-  border-color: #667eea;
+  border-color: #22c55e;
 }
 
 .monthsTitle {
@@ -358,7 +358,7 @@
 
 .createMonthButton {
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #22c55e, #16a34a);
   color: white;
   border: none;
   border-radius: 8px;
@@ -370,7 +370,7 @@
 
 .createMonthButton:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
 }
 
 .monthCardsGrid {
@@ -395,8 +395,8 @@
 }
 
 .monthCard.active {
-  border-color: #667eea;
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+  border-color: #22c55e;
+  box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
 }
 
 .monthCard.emptyMonth {
@@ -421,7 +421,7 @@
 .monthCardBadge {
   padding: 0.25rem 0.75rem;
   border-radius: 4px;
-  background: #667eea;
+  background: #22c55e;
   color: white;
   font-size: 0.8rem;
   font-weight: 600;
