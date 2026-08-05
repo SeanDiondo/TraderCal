@@ -533,55 +533,56 @@ const Journal: React.FC = () => {
           </form>
         )}
 
-        {/* Excel-like Table */}
-        <div className={styles.tableContainer}>
-          <table className={styles.spreadsheet}>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Pair</th>
-                <th>PnL USD</th>
-                <th>USD/PHP</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredTrades.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className={styles.noTrades}>
-                    {selectedMonth === 'all' 
-                      ? 'No trades recorded yet. Click "Add Trade" to start tracking.'
-                      : 'No trades for this month. Select a different month or add a new trade.'}
-                  </td>
-                </tr>
-              ) : (
-                filteredTrades.map((trade) => (
-                  <tr key={trade.id} className={trade.pnlUsd >= 0 ? styles.profitRow : styles.lossRow}>
-                    <td>{formatDate(trade.date)}</td>
-                    <td className={styles.pairCell}>{trade.pair}</td>
-                    <td className={trade.pnlUsd >= 0 ? styles.profit : styles.loss}>
-                      ${trade.pnlUsd.toFixed(2)}
-                    </td>
-                    <td>{trade.usdToPhp.toFixed(4)}</td>
-                    <td className={styles.actionsCell}>
-                      <button 
-                        className={styles.editButton}
-                        onClick={() => editTrade(trade)}
-                      >
-                        Edit
-                      </button>
-                      <button 
-                        className={styles.deleteButton}
-                        onClick={() => deleteTrade(trade.id)}
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+        {/* Trade Cards */}
+        <div className={styles.tradesGrid}>
+          {filteredTrades.length === 0 ? (
+            <div className={styles.noTrades}>
+              {selectedMonth === 'all' 
+                ? 'No trades recorded yet. Click "Add Trade" to start tracking.'
+                : 'No trades for this month. Select a different month or add a new trade.'}
+            </div>
+          ) : (
+            filteredTrades.map((trade) => (
+              <div key={trade.id} className={`${styles.tradeCard} ${trade.pnlUsd >= 0 ? styles.profitCard : styles.lossCard}`}>
+                <div className={styles.tradeCardHeader}>
+                  <div className={styles.tradePair}>{trade.pair}</div>
+                  <div className={`${styles.tradePnl} ${trade.pnlUsd >= 0 ? styles.profit : styles.loss}`}>
+                    ${trade.pnlUsd.toFixed(2)}
+                  </div>
+                </div>
+                <div className={styles.tradeCardBody}>
+                  <div className={styles.tradeDetail}>
+                    <span className={styles.tradeDetailLabel}>Date:</span>
+                    <span className={styles.tradeDetailValue}>{formatDate(trade.date)}</span>
+                  </div>
+                  <div className={styles.tradeDetail}>
+                    <span className={styles.tradeDetailLabel}>USD/PHP:</span>
+                    <span className={styles.tradeDetailValue}>{trade.usdToPhp.toFixed(4)}</span>
+                  </div>
+                  <div className={styles.tradeDetail}>
+                    <span className={styles.tradeDetailLabel}>PHP PnL:</span>
+                    <span className={`${styles.tradeDetailValue} ${(trade.pnlUsd * trade.usdToPhp) >= 0 ? styles.profit : styles.loss}`}>
+                      ₱{(trade.pnlUsd * trade.usdToPhp).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+                <div className={styles.tradeCardActions}>
+                  <button 
+                    className={styles.editButton}
+                    onClick={() => editTrade(trade)}
+                  >
+                    Edit
+                  </button>
+                  <button 
+                    className={styles.deleteButton}
+                    onClick={() => deleteTrade(trade.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
